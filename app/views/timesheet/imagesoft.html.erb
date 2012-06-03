@@ -1,0 +1,31 @@
+<h1>Timesheet#imagesoft</h1>
+<p>Find me in app/views/timesheet/imagesoft.html.erb</p>
+
+<table>
+<thead>
+  <tr>
+    <th>Duration</th>
+    <th>Billable</th>
+    <th>Start</th>
+    <th>Stop</th>
+    <th>Project</th>
+    <th>Task</th>
+    <th>Description</th>
+    <th>Ignore Start and Stop</th>
+  </tr>
+</thead>
+<tbody>
+<% @time_entries['data'].each do |time_entry| %>
+  <tr>
+    <td><%= h time_entry['duration'] %></td>
+    <td><%= h time_entry['billable'] %></td>
+    <td><%= h time_entry['start'] %></td>
+    <td><%= h time_entry['stop'] %></td>
+    <td><%= h time_entry['project']['client_project_name'] %></td>
+    <td><%= h time_entry['task']['name'] if not time_entry['task'].nil? %></td>
+    <td><%= h time_entry['description'] %></td>
+    <td><%= h time_entry['ignore_start_and_stop'] %></td>
+  </tr>
+<% end %>
+</tbody>
+</table>

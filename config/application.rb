@@ -58,5 +58,8 @@ module TogglReports
 
     # Version of your assets, change this if you want to expire all your assets
     config.assets.version = '1.0'
+
+    # API key to access toggl data
+    config.toggl_api_key = ENV['TOGGL_API_KEY']
   end
 end
