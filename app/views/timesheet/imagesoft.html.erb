@@ -15,7 +15,7 @@
   </tr>
 </thead>
 <tbody>
-<% @time_entries['data'].each do |time_entry| %>
+<% @time_entries.each do |time_entry| %>
   <tr>
     <td><%= h time_entry['duration'] %></td>
     <td><%= h time_entry['billable'] %></td>
@@ -29,3 +29,9 @@
 <% end %>
 </tbody>
 </table>
+
+<%= @weeks %>
+
+<% @weeks.each do |key, week| %>
+  <h1><%= "#{week[:start].strftime('%d/%m/%Y')} - #{week[:end].strftime('%d/%m/%Y')}" %></h1>
+<% end %>
