@@ -32,6 +32,41 @@
 
 <%= @weeks %>
 
+<h1>IMAGESOFT INTERNAL WORK TIMESHEET</h1>
+
 <% @weeks.each do |key, week| %>
-  <h1><%= "#{week[:start].strftime('%d/%m/%Y')} - #{week[:end].strftime('%d/%m/%Y')}" %></h1>
+<h2><%= "#{week[:start].strftime('%d/%m/%Y')} - #{week[:end].strftime('%d/%m/%Y')}" %></h2>
+<table border="1">
+  <thead>
+    <tr>
+      <th>Date</th>
+      <th>Time (Hrs)</th>
+      <th>Client / Application Name</th>
+      <th>Job Description</th>
+    </tr>
+  </thead>
+  <tbody>
+  <% week[:start].upto(week[:end]) do |day| %>
+    <% if @timesheet.has_key?(day.strftime('%Y%m%d')) then %>
+      <% first = true %>
+      <% @timesheet[day.strftime('%Y%m%d')].each do |client,tasks| %>
+    <tr>
+      <td><%= day.strftime('%d/%m/%Y') if first %></td>
+      <td><%= tasks[:duration] / 60.0 %></td>
+      <td><%= client %></td>
+      <td></td>
+    </tr>
+        <% first = false %>
+      <% end %>
+    <% end %>
+  <% end %>
+</tbody>
+<tfoot>
+  <tr>
+    <td>TOTAL HOURS</td>
+    <td></td>
+    <td></td>
+    <td></td>
+</tfoot>
+</table>
 <% end %>

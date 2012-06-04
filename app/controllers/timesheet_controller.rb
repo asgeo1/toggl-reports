@@ -16,14 +16,21 @@ class TimesheetController < ApplicationController
 
     @time_entries = []
     @weeks = {}
+    @timesheet = {}
 
     time_entries['data'].each do |time_entry|
       if time_entry['project']['client_project_name'] =~
       /^Dyers|Ausfast|Imagesoft/ then
         @time_entries << time_entry
+      else
+        next
       end
 
       date       = Date.parse(time_entry['start'])
+      start      = DateTime.parse(time_entry['start'])
+      stop       = DateTime.parse(time_entry['stop'])
+      client     = time_entry['project']['client_project_name'].sub('-', '/')
+      dateIdx    = date.strftime('%Y%m%d')
       week_start = Date.commercial(date.year, date.cweek, 1)
       week_end   = Date.commercial(date.year, date.cweek, 7)
 
@@ -41,6 +48,22 @@ class TimesheetController < ApplicationController
           :end   => week_end
         }
       end
+
+      if not @timesheet.has_key?("#{dateIdx}") then
+        @timesheet[dateIdx] = {}
+      end
+
+      if not @timesheet[dateIdx].has_key?("#{client}") then
+        @timesheet[dateIdx][client] = {
+          :duration => 0,
+          :times    => [],
+          :tasks    => []
+        }
+      end
+
+      duration = ((stop - start) * 24 * 60).to_i
+
+      @timesheet[dateIdx][client][:duration] += duration
     end
 
     # :user_id => 273621
