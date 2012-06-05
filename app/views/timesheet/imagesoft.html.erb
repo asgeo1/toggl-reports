@@ -46,17 +46,42 @@
     </tr>
   </thead>
   <tbody>
+  <% total_hours = 0.0 %>
   <% week[:start].upto(week[:end]) do |day| %>
-    <% if @timesheet.has_key?(day.strftime('%Y%m%d')) then %>
+    <% index = day.strftime('%Y%m%d') %>
+    <% if @timesheet.has_key?(index) then %>
       <% first = true %>
-      <% @timesheet[day.strftime('%Y%m%d')].each do |client,tasks| %>
+      <% @timesheet[index].each do |client,tasks| %>
     <tr>
       <td><%= day.strftime('%d/%m/%Y') if first %></td>
-      <td><%= tasks[:duration] / 60.0 %></td>
+        <%
+        floor = ((tasks[:duration] / @round_to_nearest).floor * @round_to_nearest)
+        if tasks[:duration] - floor > @round_to_nearest/3 then
+          duration = floor + @round_to_nearest
+        else
+          duration = floor
+        end
+        total_hours += duration / 60.0
+        %>
+      <td><%= (duration / 60.0) %></td>
       <td><%= client %></td>
-      <td></td>
+      <td><%= tasks[:tasks][0] %></td>
     </tr>
+        <% for i in (1..tasks[:tasks].length-1) %>
+    <tr>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td><%= tasks[:tasks][i] %></td>
+    </tr>
+        <% end %>
         <% first = false %>
+    <tr>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+    </tr>
       <% end %>
     <% end %>
   <% end %>
@@ -64,7 +89,7 @@
 <tfoot>
   <tr>
     <td>TOTAL HOURS</td>
-    <td></td>
+    <td><%= total_hours %></td>
     <td></td>
     <td></td>
 </tfoot>

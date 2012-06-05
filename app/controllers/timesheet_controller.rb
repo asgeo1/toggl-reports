@@ -64,12 +64,18 @@ class TimesheetController < ApplicationController
       duration = ((stop - start) * 24 * 60).to_i
 
       @timesheet[dateIdx][client][:duration] += duration
+      if not @timesheet[dateIdx][client][:tasks].include?(
+        time_entry['description']
+      ) then
+        @timesheet[dateIdx][client][:tasks] << time_entry['description']
+      end
     end
 
     # :user_id => 273621
 
     @clients  = toggl.clients()
     @projects = toggl.projects()
+    @round_to_nearest = 30
   end
 
   def ipra
