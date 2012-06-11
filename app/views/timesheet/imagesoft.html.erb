@@ -56,26 +56,43 @@
       <td><%= day.strftime('%d/%m/%Y') if first %></td>
         <%
         floor = ((tasks[:duration] / @round_to_nearest).floor * @round_to_nearest)
+        times = tasks[:times].map {|time| "#{time[:start].strftime('%l:%M')}-#{time[:stop].strftime('%l:%M%P')}"}.join(', ')
+
         if tasks[:duration] - floor > @round_to_nearest/3 then
           duration = floor + @round_to_nearest
         else
           duration = floor
         end
+
         total_hours += duration / 60.0
         %>
-      <td><%= (duration / 60.0) %></td>
+      <td><%= "#{(duration / 60.0)} hrs" %></td>
       <td><%= client %></td>
-      <td><%= tasks[:tasks][0] %></td>
+      <td>1. <%= tasks[:tasks][0] %></td>
     </tr>
         <% for i in (1..tasks[:tasks].length-1) %>
     <tr>
       <td></td>
-      <td></td>
-      <td></td>
-      <td><%= tasks[:tasks][i] %></td>
-    </tr>
+      <td>
+        <% if i == 1 then %>
+          <%= times %>
         <% end %>
-        <% first = false %>
+      </td>
+      <td></td>
+      <td><%= "#{(i+1)}. #{tasks[:tasks][i]}" %></td>
+    </tr>
+      <% end %>
+      <% first = false %>
+      <% if tasks[:tasks].length == 1 then %>
+    <tr>
+      <td></td>
+      <td>
+        <%= times %>
+      </td>
+      <td></td>
+      <td></td>
+    </tr>
+      <% end %>
     <tr>
       <td>&nbsp;</td>
       <td>&nbsp;</td>

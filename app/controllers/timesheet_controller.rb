@@ -69,6 +69,11 @@ class TimesheetController < ApplicationController
       ) then
         @timesheet[dateIdx][client][:tasks] << time_entry['description']
       end
+
+      @timesheet[dateIdx][client][:times] << {
+        :start => start,
+        :stop  => stop
+      }
     end
 
     # :user_id => 273621
