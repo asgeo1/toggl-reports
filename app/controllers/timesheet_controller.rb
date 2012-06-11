@@ -1,7 +1,6 @@
 
 class TimesheetController < ApplicationController
-  def index
-  end
+  http_basic_authenticate_with :name => ENV['TIMESHEET_USERNAME'], :password => ENV['TIMESHEET_PASSWORD']
 
   def imagesoft
     toggl = Toggl.new(ENV['TOGGL_API_KEY'], 'api_token')
