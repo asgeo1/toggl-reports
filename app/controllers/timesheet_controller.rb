@@ -81,6 +81,18 @@ class TimesheetController < ApplicationController
     @clients  = toggl.clients()
     @projects = toggl.projects()
     @round_to_nearest = 30
+
+    respond_to do |format|
+      format.html
+      format.xls {
+        send_data(
+          render_to_string,
+          :type        => 'application/vnd.ms-excel',
+          :disposition => 'attachment',
+          :filename    => "timesheet_adam_#{start_date.strftime('%Y-%m-%d')}_#{end_date.strftime('%Y-%m-%d')}.xls"
+        )
+      }
+    end
   end
 
   def ipra

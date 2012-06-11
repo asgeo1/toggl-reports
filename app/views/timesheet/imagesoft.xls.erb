@@ -1,0 +1,207 @@
+<?xml version="1.0"?>
+<?mso-application progid="Excel.Sheet"?>
+<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet"
+ xmlns:o="urn:schemas-microsoft-com:office:office"
+ xmlns:x="urn:schemas-microsoft-com:office:excel"
+ xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet"
+ xmlns:html="http://www.w3.org/TR/REC-html40">
+ <DocumentProperties xmlns="urn:schemas-microsoft-com:office:office">
+  <Author>Alison Thomas</Author>
+  <LastAuthor>Glen Tunny</LastAuthor>
+  <LastPrinted>2005-07-14T02:01:25Z</LastPrinted>
+  <Created>2001-09-20T06:34:59Z</Created>
+  <LastSaved>2012-06-11T03:23:27Z</LastSaved>
+  <Company>Valleyfast Country Couriers</Company>
+  <Version>11.5606</Version>
+ </DocumentProperties>
+ <ExcelWorkbook xmlns="urn:schemas-microsoft-com:office:excel">
+  <WindowHeight>8535</WindowHeight>
+  <WindowWidth>15135</WindowWidth>
+  <WindowTopX>120</WindowTopX>
+  <WindowTopY>75</WindowTopY>
+  <AcceptLabelsInFormulas/>
+  <ProtectStructure>False</ProtectStructure>
+  <ProtectWindows>False</ProtectWindows>
+ </ExcelWorkbook>
+ <Styles>
+  <Style ss:ID="Default" ss:Name="Normal">
+   <Alignment ss:Vertical="Bottom"/>
+   <Borders/>
+   <Font/>
+   <Interior/>
+   <NumberFormat/>
+   <Protection/>
+  </Style>
+  <Style ss:ID="s23">
+   <Font x:Family="Swiss" ss:Size="18"/>
+  </Style>
+  <Style ss:ID="s25">
+   <Borders>
+    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1"/>
+    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1"/>
+    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1"/>
+    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1"/>
+   </Borders>
+   <Font x:Family="Swiss" ss:Size="16"/>
+  </Style>
+  <Style ss:ID="s26">
+   <Borders>
+    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1"/>
+    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1"/>
+    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1"/>
+   </Borders>
+   <Font x:Family="Swiss" ss:Size="16"/>
+  </Style>
+  <Style ss:ID="s28">
+   <Alignment ss:Vertical="Bottom" ss:WrapText="1"/>
+   <Borders>
+    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1"/>
+    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1"/>
+    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1"/>
+   </Borders>
+   <Font x:Family="Swiss"/>
+   <NumberFormat ss:Format="@"/>
+  </Style>
+  <Style ss:ID="s29">
+   <Alignment ss:Vertical="Bottom" ss:WrapText="1"/>
+   <Borders>
+    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1"/>
+    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1"/>
+   </Borders>
+   <Font x:Family="Swiss"/>
+   <NumberFormat ss:Format="@"/>
+  </Style>
+  <Style ss:ID="s31">
+   <Alignment ss:Vertical="Bottom" ss:WrapText="1"/>
+   <Borders>
+    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1"/>
+    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1"/>
+    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1"/>
+   </Borders>
+   <Font x:Family="Swiss" ss:Bold="1"/>
+   <NumberFormat ss:Format="@"/>
+  </Style>
+ </Styles>
+
+<% @weeks.each do |key, week| %>
+ <% tab = "#{week[:start].strftime('%d%^b')}-#{week[:end].strftime('%d%^b')}" %>
+ <Worksheet ss:Name="<%= tab %>">
+  <Names>
+   <NamedRange ss:Name="Print_Area" ss:RefersTo="='<%= tab %>'!R3C1:R23C4"/>
+  </Names>
+  <Table ss:ExpandedColumnCount="5" ss:ExpandedRowCount="44" x:FullColumns="1"
+   x:FullRows="1">
+   <Column ss:AutoFitWidth="0" ss:Width="76.5"/>
+   <Column ss:AutoFitWidth="0" ss:Width="200.75"/>
+   <Column ss:AutoFitWidth="0" ss:Width="189.75"/>
+   <Column ss:AutoFitWidth="0" ss:Width="440.75"/>
+   <Column ss:AutoFitWidth="0" ss:Width="69.75"/>
+   <Row ss:Height="23.25">
+    <Cell ss:StyleID="s23"><Data ss:Type="String">IMAGESOFT INTERNAL WORK TIMESHEET</Data></Cell>
+    <Cell ss:StyleID="s23"/>
+    <Cell ss:StyleID="s23"/>
+   </Row>
+   <Row ss:Index="3" ss:Height="20.25">
+    <Cell ss:StyleID="s25"><Data ss:Type="String">Date</Data><NamedCell ss:Name="Print_Area"/></Cell>
+    <Cell ss:StyleID="s26"><Data ss:Type="String">Time (Hrs)</Data><NamedCell ss:Name="Print_Area"/></Cell>
+    <Cell ss:StyleID="s26"><Data ss:Type="String">Client / Application Name</Data><NamedCell ss:Name="Print_Area"/></Cell>
+    <Cell ss:StyleID="s26"><Data ss:Type="String">Job Description</Data><NamedCell ss:Name="Print_Area"/></Cell>
+   </Row>
+  <% total_hours = 0.0 %>
+  <% week[:start].upto(week[:end]) do |day| %>
+    <% index = day.strftime('%Y%m%d') %>
+    <% if @timesheet.has_key?(index) then %>
+      <% first = true %>
+      <% @timesheet[index].each do |client,tasks| %>
+    <Row>
+      <Cell ss:StyleID="s28"><Data ss:Type="String"><%= day.strftime('%d/%m/%Y') if first %></Data><NamedCell ss:Name="Print_Area"/></Cell>
+        <%
+        floor = ((tasks[:duration] / @round_to_nearest).floor * @round_to_nearest)
+        times = tasks[:times].map {|time|
+          start = time[:start].strftime('%l:%M').tap{|x| x.strip!}
+          stop  = time[:stop].strftime('%l:%M%P').tap{|x| x.strip!}
+          "#{start}-#{stop}"
+        }.join(', ')
+
+        if tasks[:duration] - floor > @round_to_nearest/3 then
+          duration = floor + @round_to_nearest
+        else
+          duration = floor
+        end
+
+        total_hours += duration / 60.0
+        %>
+      <Cell ss:StyleID="s29"><Data ss:Type="String"><%= "#{(duration / 60.0)} hrs" %></Data><NamedCell ss:Name="Print_Area"/></Cell>
+      <Cell ss:StyleID="s29"><Data ss:Type="String"><%= client %></Data><NamedCell ss:Name="Print_Area"/></Cell>
+      <Cell ss:StyleID="s29"><Data ss:Type="String">1. <%= tasks[:tasks][0] %></Data><NamedCell ss:Name="Print_Area"/></Cell>
+    </Row>
+        <% for i in (1..tasks[:tasks].length-1) %>
+    <Row>
+      <Cell ss:StyleID="s28"><NamedCell ss:Name="Print_Area"/></Cell>
+      <Cell ss:StyleID="s29">
+        <Data ss:Type="String"><%= times if i == 1 %></Data>
+        <NamedCell ss:Name="Print_Area"/>
+      </Cell>
+      <Cell ss:StyleID="s29"><NamedCell ss:Name="Print_Area"/></Cell>
+      <Cell ss:StyleID="s29"><Data ss:Type="String"><%= "#{(i+1)}. #{tasks[:tasks][i]}" %></Data><NamedCell ss:Name="Print_Area"/></Cell>
+    </Row>
+      <% end %>
+      <% first = false %>
+      <% if tasks[:tasks].length == 1 then %>
+    <Row>
+      <Cell ss:StyleID="s28"><NamedCell ss:Name="Print_Area"/></Cell>
+      <Cell ss:StyleID="s29">
+        <Data ss:Type="String"><%= times %></Data>
+        <NamedCell ss:Name="Print_Area"/>
+      </Cell>
+      <Cell ss:StyleID="s29"><NamedCell ss:Name="Print_Area"/></Cell>
+      <Cell ss:StyleID="s29"><NamedCell ss:Name="Print_Area"/></Cell>
+    </Row>
+      <% end %>
+    <Row>
+      <Cell ss:StyleID="s28"><NamedCell ss:Name="Print_Area"/></Cell>
+      <Cell ss:StyleID="s29"><NamedCell ss:Name="Print_Area"/></Cell>
+      <Cell ss:StyleID="s29"><NamedCell ss:Name="Print_Area"/></Cell>
+      <Cell ss:StyleID="s29"><NamedCell ss:Name="Print_Area"/></Cell>
+    </Row>
+      <% end %>
+    <Row>
+      <Cell ss:StyleID="s28"><NamedCell ss:Name="Print_Area"/></Cell>
+      <Cell ss:StyleID="s29"><NamedCell ss:Name="Print_Area"/></Cell>
+      <Cell ss:StyleID="s29"><NamedCell ss:Name="Print_Area"/></Cell>
+      <Cell ss:StyleID="s29"><NamedCell ss:Name="Print_Area"/></Cell>
+    </Row>
+    <% end %>
+  <% end %>
+   <Row>
+    <Cell ss:StyleID="s31"><Data ss:Type="String">TOTAL HOURS</Data><NamedCell ss:Name="Print_Area"/></Cell>
+    <Cell ss:StyleID="s29"><Data ss:Type="String"><%= total_hours %> hrs</Data><NamedCell ss:Name="Print_Area"/></Cell>
+    <Cell ss:StyleID="s29"><NamedCell ss:Name="Print_Area"/></Cell>
+    <Cell ss:StyleID="s29"><NamedCell ss:Name="Print_Area"/></Cell>
+   </Row>
+  </Table>
+  <WorksheetOptions xmlns="urn:schemas-microsoft-com:office:excel">
+   <PageSetup>
+    <Layout x:Orientation="Landscape"/>
+   </PageSetup>
+   <FitToPage/>
+   <Print>
+    <ValidPrinterInfo/>
+    <PaperSizeIndex>9</PaperSizeIndex>
+    <Scale>91</Scale>
+    <HorizontalResolution>600</HorizontalResolution>
+    <VerticalResolution>600</VerticalResolution>
+   </Print>
+   <Selected/>
+   <Panes>
+    <Pane>
+     <Number>3</Number>
+     <ActiveRow>3</ActiveRow>
+    </Pane>
+   </Panes>
+   <ProtectObjects>False</ProtectObjects>
+   <ProtectScenarios>False</ProtectScenarios>
+  </WorksheetOptions>
+ </Worksheet>
+<% end %>
+</Workbook>
