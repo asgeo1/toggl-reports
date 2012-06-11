@@ -6,12 +6,23 @@ class TimesheetController < ApplicationController
   def imagesoft
     toggl = Toggl.new(ENV['TOGGL_API_KEY'], 'api_token')
 
-    start_date = DateTime.parse('2012-05-01T00:00:00+10:00')
-    end_date   = DateTime.parse('2012-05-31T23:59:59+10:00')
+    if params.has_key?(:start_date) then
+      @start_date = DateTime.parse("#{params[:start_date]}T00:00:00+10:00")
+    else
+      @start_date = Date.today.prev_month.beginning_of_month
+    end
+
+    if params.has_key?(:end_date) then
+      @end_date = DateTime.parse("#{params[:end_date]}T23:59:59+10:00")
+    else
+      @end_date = DateTime.parse(
+        "#{Date.today.prev_month.end_of_month.strftime('%Y-%m-%d')}T23:59:59+10:00"
+      )
+    end
 
     time_entries = toggl.timeentries({:query => {
-      :start_date => start_date.iso8601,
-      :end_date   => end_date.iso8601,
+      :start_date => @start_date.iso8601,
+      :end_date   => @end_date.iso8601,
     }})
 
     @time_entries = []
@@ -34,12 +45,12 @@ class TimesheetController < ApplicationController
       week_start = Date.commercial(date.year, date.cweek, 1)
       week_end   = Date.commercial(date.year, date.cweek, 7)
 
-      if week_end > end_date then
-        week_end = end_date
+      if week_end > @end_date then
+        week_end = @end_date
       end
 
-      if week_start < start_date then
-        week_start = start_date
+      if week_start < @start_date then
+        week_start = @start_date
       end
 
       if not @weeks.has_key?("#{date.year}_#{date.cweek}") then
@@ -89,7 +100,7 @@ class TimesheetController < ApplicationController
           render_to_string,
           :type        => 'application/vnd.ms-excel',
           :disposition => 'attachment',
-          :filename    => "timesheet_adam_#{start_date.strftime('%Y-%m-%d')}_#{end_date.strftime('%Y-%m-%d')}.xls"
+          :filename    => "timesheet_adam_#{@start_date.strftime('%Y-%m-%d')}_#{@end_date.strftime('%Y-%m-%d')}.xls"
         )
       }
     end

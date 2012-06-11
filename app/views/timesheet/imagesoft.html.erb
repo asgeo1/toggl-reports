@@ -1,3 +1,9 @@
+<%= form_tag timesheet_imagesoft_path, :method => 'GET' do %>
+  <%= text_field_tag 'start_date', @start_date.strftime('%Y-%m-%d') %>
+  <%= text_field_tag 'end_date',   @end_date.strftime('%Y-%m-%d')   %>
+  <%= submit_tag 'Go' %>
+<% end %>
+
 <p><%= link_to 'Download in Excel', timesheet_imagesoft_path(:format => :xls) %></p>
 
 <!--
