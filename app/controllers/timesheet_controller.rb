@@ -1,4 +1,3 @@
-
 class TimesheetController < ApplicationController
   http_basic_authenticate_with :name => ENV['TIMESHEET_USERNAME'], :password => ENV['TIMESHEET_PASSWORD']
 
