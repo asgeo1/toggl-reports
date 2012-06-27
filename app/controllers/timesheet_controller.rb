@@ -26,6 +26,7 @@ class TimesheetController < ApplicationController
     @time_entries = []
     @weeks = {}
     @timesheet = {}
+    @round_to_nearest = 30
 
     time_entries['data'].each do |time_entry|
       if time_entry['project']['client_project_name'] =~
@@ -79,9 +80,12 @@ class TimesheetController < ApplicationController
         @timesheet[dateIdx][client][:tasks] << time_entry['description']
       end
 
+      #Round the individual tasks first. Remove this to just round at the end
       @timesheet[dateIdx][client][:times] << {
-        :start => start,
-        :stop  => stop
+        #:start => start,
+        #:stop  => stop
+        :start => Time.at((start.to_f / (@round_to_nearest * 60)).round * (@round_to_nearest * 60)),
+        :stop  => Time.at((stop.to_f  / (@round_to_nearest * 60)).round * (@round_to_nearest * 60))
       }
     end
 
@@ -89,7 +93,6 @@ class TimesheetController < ApplicationController
 
     @clients  = toggl.clients()
     @projects = toggl.projects()
-    @round_to_nearest = 30
 
     respond_to do |format|
       format.html
