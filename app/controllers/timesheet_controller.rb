@@ -27,6 +27,7 @@ class TimesheetController < ApplicationController
     @weeks = {}
     @timesheet = {}
     @round_to_nearest = 30
+    @round_threshold  = @round_to_nearest / 2
 
     time_entries['data'].each do |time_entry|
       if time_entry['project']['client_project_name'] =~
@@ -61,6 +62,10 @@ class TimesheetController < ApplicationController
 
       if not @timesheet.has_key?("#{dateIdx}") then
         @timesheet[dateIdx] = {}
+        #round start-of-day time to nearest half-hour based on first 20 minutes
+        @round_threshold = @round_to_nearest / 3 * 2
+      else
+        @round_threshold = @round_to_nearest / 2
       end
 
       if not @timesheet[dateIdx].has_key?("#{client}") then
@@ -72,8 +77,20 @@ class TimesheetController < ApplicationController
       end
 
       #Round the individual tasks first
-      start = Time.at((start.to_f / (@round_to_nearest * 60)).round * (@round_to_nearest * 60))
-      stop  = Time.at((stop.to_f  / (@round_to_nearest * 60)).round * (@round_to_nearest * 60))
+      start_floor = Time.at((start.to_f / (@round_to_nearest*60)).floor * (@round_to_nearest*60))
+      stop_floor  = Time.at((stop.to_f  / (@round_to_nearest*60)).floor * (@round_to_nearest*60))
+
+      if Time.at(start.to_f) - start_floor > @round_threshold*60 then
+        start = start_floor + @round_to_nearest*60
+      else
+        start = start_floor
+      end
+
+      if Time.at(stop.to_f) - stop_floor > @round_threshold*60 then
+        stop = stop_floor + @round_to_nearest*60
+      else
+        stop = stop_floor
+      end
 
       duration = ((stop - start) / 60).to_i
 
@@ -88,7 +105,7 @@ class TimesheetController < ApplicationController
 
       if not last.nil? and last[:stop] == start
         @timesheet[dateIdx][client][:times][-1][:stop] = stop
-      else
+      elsif start != stop
         @timesheet[dateIdx][client][:times] << {
           :start => start,
           :stop  => stop

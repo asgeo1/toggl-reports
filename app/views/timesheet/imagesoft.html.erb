@@ -71,7 +71,7 @@
           "#{start}-#{stop}"
         }.join(', ')
 
-        if tasks[:duration] - floor > @round_to_nearest/3 then
+        if tasks[:duration] - floor > @round_to_nearest/2 then
           duration = floor + @round_to_nearest
         else
           duration = floor
