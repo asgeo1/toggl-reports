@@ -84,10 +84,16 @@ class TimesheetController < ApplicationController
         @timesheet[dateIdx][client][:tasks] << time_entry['description']
       end
 
-      @timesheet[dateIdx][client][:times] << {
-        :start => start,
-        :stop  => stop
-      }
+      last = @timesheet[dateIdx][client][:times].last
+
+      if not last.nil? and last[:stop] == start
+        @timesheet[dateIdx][client][:times][-1][:stop] = stop
+      else
+        @timesheet[dateIdx][client][:times] << {
+          :start => start,
+          :stop  => stop
+        }
+      end
     end
 
     # :user_id => 273621
