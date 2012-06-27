@@ -4,7 +4,7 @@
   <%= submit_tag 'Go' %>
 <% end %>
 
-<p><%= link_to 'Download in Excel', timesheet_imagesoft_path(:format => :xls) %></p>
+<p><%= link_to 'Download in Excel', timesheet_imagesoft_path(:format => :xls, :params => params) %></p>
 
 <!--
 <table>
