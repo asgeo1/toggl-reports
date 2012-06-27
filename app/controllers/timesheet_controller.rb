@@ -71,7 +71,11 @@ class TimesheetController < ApplicationController
         }
       end
 
-      duration = ((stop - start) * 24 * 60).to_i
+      #Round the individual tasks first
+      start = Time.at((start.to_f / (@round_to_nearest * 60)).round * (@round_to_nearest * 60))
+      stop  = Time.at((stop.to_f  / (@round_to_nearest * 60)).round * (@round_to_nearest * 60))
+
+      duration = ((stop - start) / 60).to_i
 
       @timesheet[dateIdx][client][:duration] += duration
       if not @timesheet[dateIdx][client][:tasks].include?(
@@ -80,12 +84,9 @@ class TimesheetController < ApplicationController
         @timesheet[dateIdx][client][:tasks] << time_entry['description']
       end
 
-      #Round the individual tasks first. Remove this to just round at the end
       @timesheet[dateIdx][client][:times] << {
-        #:start => start,
-        #:stop  => stop
-        :start => Time.at((start.to_f / (@round_to_nearest * 60)).round * (@round_to_nearest * 60)),
-        :stop  => Time.at((stop.to_f  / (@round_to_nearest * 60)).round * (@round_to_nearest * 60))
+        :start => start,
+        :stop  => stop
       }
     end
 

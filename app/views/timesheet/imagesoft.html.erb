@@ -62,6 +62,8 @@
     <tr>
       <td><%= day.strftime('%d/%m/%Y') if first %></td>
         <%
+        #NOTE: this rounding is not needed anymore, as I'm already rounding at
+        #the task level in the controller now
         floor = ((tasks[:duration] / @round_to_nearest).floor * @round_to_nearest)
         times = tasks[:times].map {|time|
           start = time[:start].strftime('%l:%M').tap{|x| x.strip!}
