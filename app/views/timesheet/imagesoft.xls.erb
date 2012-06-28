@@ -118,12 +118,12 @@
         <%
         floor = ((tasks[:duration] / @round_to_nearest).floor * @round_to_nearest)
         times = tasks[:times].map {|time|
-          start = time[:start].strftime('%l:%M').tap{|x| x.strip!}
+          start = time[:start].strftime('%l:%M%P').tap{|x| x.strip!}
           stop  = time[:stop].strftime('%l:%M%P').tap{|x| x.strip!}
           "#{start}-#{stop}"
         }.join(', ')
 
-        if tasks[:duration] - floor > @round_to_nearest/3 then
+        if tasks[:duration] - floor > @round_to_nearest/2 then
           duration = floor + @round_to_nearest
         else
           duration = floor
