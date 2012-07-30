@@ -92,9 +92,16 @@ class TimesheetController < ApplicationController
         stop = stop_floor
       end
 
+      # toggle for some reason records the end time if it is past midnight as
+      # the same date, even though it is really the next day
+      if stop < start then
+        stop = stop + 1.day
+      end
+
       duration = ((stop - start) / 60).to_i
 
       @timesheet[dateIdx][client][:duration] += duration
+
       if not @timesheet[dateIdx][client][:tasks].include?(
         time_entry['description']
       ) then
