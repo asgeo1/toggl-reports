@@ -86,9 +86,6 @@
 <% @weeks.each do |key, week| %>
  <% tab = "#{week[:start].strftime('%d%^b')}-#{week[:end].strftime('%d%^b')}" %>
  <Worksheet ss:Name="<%= tab %>">
-  <Names>
-   <NamedRange ss:Name="Print_Area" ss:RefersTo="='<%= tab %>'!R3C1:R23C4"/>
-  </Names>
   <Table ss:ExpandedColumnCount="5" ss:ExpandedRowCount="44" x:FullColumns="1"
    x:FullRows="1">
    <Column ss:AutoFitWidth="0" ss:Width="76.5"/>
@@ -108,6 +105,7 @@
     <Cell ss:StyleID="s26"><Data ss:Type="String">Job Description</Data><NamedCell ss:Name="Print_Area"/></Cell>
    </Row>
   <% total_hours = 0.0 %>
+  <% rows = 0 %>
   <% week[:start].upto(week[:end]) do |day| %>
     <% index = day.strftime('%Y%m%d') %>
     <% if @timesheet.has_key?(index) then %>
@@ -135,6 +133,7 @@
       <Cell ss:StyleID="s29"><Data ss:Type="String"><%= client %></Data><NamedCell ss:Name="Print_Area"/></Cell>
       <Cell ss:StyleID="s29"><Data ss:Type="String">1. <%= tasks[:tasks][0] %></Data><NamedCell ss:Name="Print_Area"/></Cell>
     </Row>
+    <% rows += 1 %>
         <% for i in (1..tasks[:tasks].length-1) %>
     <Row>
       <Cell ss:StyleID="s28"><NamedCell ss:Name="Print_Area"/></Cell>
@@ -145,6 +144,7 @@
       <Cell ss:StyleID="s29"><NamedCell ss:Name="Print_Area"/></Cell>
       <Cell ss:StyleID="s29"><Data ss:Type="String"><%= "#{(i+1)}. #{tasks[:tasks][i]}" %></Data><NamedCell ss:Name="Print_Area"/></Cell>
     </Row>
+    <% rows += 1 %>
       <% end %>
       <% first = false %>
       <% if tasks[:tasks].length == 1 then %>
@@ -157,6 +157,7 @@
       <Cell ss:StyleID="s29"><NamedCell ss:Name="Print_Area"/></Cell>
       <Cell ss:StyleID="s29"><NamedCell ss:Name="Print_Area"/></Cell>
     </Row>
+    <% rows += 1 %>
       <% end %>
     <Row>
       <Cell ss:StyleID="s28"><NamedCell ss:Name="Print_Area"/></Cell>
@@ -164,6 +165,7 @@
       <Cell ss:StyleID="s29"><NamedCell ss:Name="Print_Area"/></Cell>
       <Cell ss:StyleID="s29"><NamedCell ss:Name="Print_Area"/></Cell>
     </Row>
+    <% rows += 1 %>
       <% end %>
     <Row>
       <Cell ss:StyleID="s28"><NamedCell ss:Name="Print_Area"/></Cell>
@@ -171,6 +173,7 @@
       <Cell ss:StyleID="s29"><NamedCell ss:Name="Print_Area"/></Cell>
       <Cell ss:StyleID="s29"><NamedCell ss:Name="Print_Area"/></Cell>
     </Row>
+    <% rows += 1 %>
     <% end %>
   <% end %>
    <Row>
@@ -179,7 +182,11 @@
     <Cell ss:StyleID="s29"><NamedCell ss:Name="Print_Area"/></Cell>
     <Cell ss:StyleID="s29"><NamedCell ss:Name="Print_Area"/></Cell>
    </Row>
+   <% rows += 1 %>
   </Table>
+  <Names>
+    <NamedRange ss:Name="Print_Area" ss:RefersTo="='<%= tab %>'!R3C1:R<%= (3+rows) %>C4"/>
+  </Names>
   <WorksheetOptions xmlns="urn:schemas-microsoft-com:office:excel">
    <PageSetup>
     <Layout x:Orientation="Landscape"/>
