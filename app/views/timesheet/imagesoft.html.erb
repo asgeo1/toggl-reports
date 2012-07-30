@@ -79,7 +79,7 @@
 
         total_hours += duration / 60.0
         %>
-      <td><%= "#{(duration / 60.0)} hrs" %></td>
+      <td><%= "#{(duration / 60.0)} hrs" %><%= ", including #{(tasks[:travel] / 60.0)} hrs travel" if tasks[:travel] > 0 %></td>
       <td><%= client %></td>
       <td>1. <%= tasks[:tasks][0] %></td>
     </tr>

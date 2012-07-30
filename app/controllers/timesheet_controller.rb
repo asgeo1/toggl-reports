@@ -71,6 +71,7 @@ class TimesheetController < ApplicationController
       if not @timesheet[dateIdx].has_key?("#{client}") then
         @timesheet[dateIdx][client] = {
           :duration => 0,
+          :travel   => 0,
           :times    => [],
           :tasks    => []
         }
@@ -101,6 +102,10 @@ class TimesheetController < ApplicationController
       duration = ((stop - start) / 60).to_i
 
       @timesheet[dateIdx][client][:duration] += duration
+
+      if not time_entry['task'].nil? and time_entry['task']['name'] == 'Travel'
+        @timesheet[dateIdx][client][:travel] += duration
+      end
 
       if not @timesheet[dateIdx][client][:tasks].include?(
         time_entry['description']

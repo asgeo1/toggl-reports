@@ -131,7 +131,7 @@
 
         total_hours += duration / 60.0
         %>
-      <Cell ss:StyleID="s29"><Data ss:Type="String"><%= "#{(duration / 60.0)} hrs" %></Data><NamedCell ss:Name="Print_Area"/></Cell>
+      <Cell ss:StyleID="s29"><Data ss:Type="String"><%= "#{(duration / 60.0)} hrs" %><%= ", including #{(tasks[:travel] / 60.0)} hrs travel" if tasks[:travel] > 0 %></Data><NamedCell ss:Name="Print_Area"/></Cell>
       <Cell ss:StyleID="s29"><Data ss:Type="String"><%= client %></Data><NamedCell ss:Name="Print_Area"/></Cell>
       <Cell ss:StyleID="s29"><Data ss:Type="String">1. <%= tasks[:tasks][0] %></Data><NamedCell ss:Name="Print_Area"/></Cell>
     </Row>
