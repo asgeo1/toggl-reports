@@ -130,7 +130,7 @@
         total_hours += duration / 60.0
 
         tmp = client.match /\((.*)\)/
-        if not tmp[0].nil?
+        if not tmp.nil? and not tmp[0].nil?
           client = client.sub(/\((.*)\)/, '')
           client = client.sub('Imagesoft', tmp[0].gsub(/[\(\)]/, ''))
         end
