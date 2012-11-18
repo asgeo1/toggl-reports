@@ -78,6 +78,12 @@
         end
 
         total_hours += duration / 60.0
+
+        tmp = client.match /\((.*)\)/
+        if not tmp[0].nil?
+          client = client.sub(/\((.*)\)/, '')
+          client = client.sub('Imagesoft', tmp[0].gsub(/[\(\)]/, ''))
+        end
         %>
       <td><%= "#{(duration / 60.0)} hrs" %><%= ", including #{(tasks[:travel] / 60.0)} hrs travel" if tasks[:travel] > 0 %></td>
       <td><%= client %></td>
