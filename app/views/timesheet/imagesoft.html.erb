@@ -41,6 +41,7 @@
 
 <h1>IMAGESOFT INTERNAL WORK TIMESHEET</h1>
 
+<% total_total_hours = 0.0 %>
 <% @weeks.each do |key, week| %>
 <h2><%= "#{week[:start].strftime('%d/%m/%Y')} - #{week[:end].strftime('%d/%m/%Y')}" %></h2>
 <table border="1">
@@ -78,6 +79,7 @@
         end
 
         total_hours += duration / 60.0
+        total_total_hours += duration / 60.0
 
         tmp = client.match /\((.*)\)/
         if not tmp[0].nil?
@@ -131,3 +133,5 @@
 </tfoot>
 </table>
 <% end %>
+
+<p>Total for period: <%= total_total_hours %></p>
