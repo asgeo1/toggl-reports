@@ -41,6 +41,7 @@
 
 <h1>IMAGESOFT INTERNAL WORK TIMESHEET</h1>
 
+<% total_by_clients = {} %>
 <% total_total_hours = 0.0 %>
 <% @weeks.each do |key, week| %>
 <h2><%= "#{week[:start].strftime('%d/%m/%Y')} - #{week[:end].strftime('%d/%m/%Y')}" %></h2>
@@ -84,8 +85,17 @@
         tmp = client.match /\((.*)\)/
         if not tmp.nil? and not tmp[0].nil?
           client = client.sub(/\((.*)\)/, '')
-          client = client.sub('Imagesoft', tmp[0].gsub(/[\(\)]/, ''))
+          client_name = tmp[0].gsub(/[\(\)]/, '')
+          client = client.sub('Imagesoft', client_name)
+        else
+          client_name = 'Imagesoft'
         end
+
+        if total_by_clients[client_name].nil?
+          total_by_clients[client_name] = 0.0
+        end
+
+        total_by_clients[client_name] += duration / 60.0
         %>
       <td><%= "#{(duration / 60.0)} hrs" %><%= ", including #{(tasks[:travel] / 60.0)} hrs travel" if tasks[:travel] > 0 %></td>
       <td><%= client %></td>
@@ -135,3 +145,9 @@
 <% end %>
 
 <p>Total for period: <%= total_total_hours %></p>
+
+<ul>
+<% total_by_clients.each do |client, hours| %>
+  <li><%= "#{client}: #{hours}" %></li>
+<% end %>
+</ul>
