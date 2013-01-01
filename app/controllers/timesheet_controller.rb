@@ -42,8 +42,8 @@ class TimesheetController < ApplicationController
       stop       = DateTime.parse(time_entry['stop'])
       client     = time_entry['project']['client_project_name'].sub('-', '/')
       dateIdx    = date.strftime('%Y%m%d')
-      week_start = Date.commercial(date.year, date.cweek, 1)
-      week_end   = Date.commercial(date.year, date.cweek, 7)
+      week_start = Date.commercial(date.cwyear, date.cweek, 1)
+      week_end   = Date.commercial(date.cwyear, date.cweek, 7)
 
       if week_end > @end_date then
         week_end = @end_date
@@ -53,8 +53,8 @@ class TimesheetController < ApplicationController
         week_start = @start_date
       end
 
-      if not @weeks.has_key?("#{date.year}_#{date.cweek}") then
-        @weeks["#{date.year}_#{date.cweek}"] = {
+      if not @weeks.has_key?("#{date.cwyear}_#{date.cweek}") then
+        @weeks["#{date.cwyear}_#{date.cweek}"] = {
           :start => week_start,
           :end   => week_end
         }
