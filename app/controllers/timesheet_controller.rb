@@ -31,7 +31,7 @@ class TimesheetController < ApplicationController
 
     time_entries['data'].each do |time_entry|
       if time_entry['project']['client_project_name'] =~
-      /^Dyers|Ausfast|Imagesoft|DKL|Microlistics/ then
+      /^Dyers|Ausfast|Imagesoft|DKL/ then
         @time_entries << time_entry
       else
         next
