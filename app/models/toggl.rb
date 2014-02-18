@@ -1,5 +1,6 @@
 class Toggl
   include HTTParty
+  debug_output $stderr if Rails.env.development?
   base_uri 'https://www.toggl.com'
 
   def initialize(u, p)
@@ -8,16 +9,21 @@ class Toggl
 
   def timeentries(options = {})
     options.merge!({:basic_auth => @auth})
-    self.class.get('/api/v6/time_entries.json', options)
+    self.class.get('/api/v7/time_entries.json', options)
   end
 
   def clients(options = {})
     options.merge!({:basic_auth => @auth})
-    self.class.get('/api/v6/clients.json', options)
+    self.class.get('/api/v7/clients.json', options)
   end
 
   def projects(options = {})
     options.merge!({:basic_auth => @auth})
-    self.class.get('/api/v6/projects.json', options)
+    self.class.get('/api/v7/projects.json', options)
+  end
+
+  def tasks(options = {})
+    options.merge!({:basic_auth => @auth})
+    self.class.get('/api/v7/tasks.json', options)
   end
 end

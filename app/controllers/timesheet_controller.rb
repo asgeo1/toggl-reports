@@ -29,22 +29,31 @@ class TimesheetController < ApplicationController
     @round_to_nearest = 30
     @round_threshold  = @round_to_nearest / 2
 
+    @clients  = toggl.clients()
+    @projects = toggl.projects()
+    @tasks    = toggl.tasks()
+
     if time_entries.present? and time_entries['data'].present?
       time_entries['data'].each do |time_entry|
-        if time_entry['project']['client_project_name'] =~
-        /^Dyers|Ausfast|Imagesoft|DKL/ then
+        project = @projects['data'].find {|p| p['id'] == time_entry['pid'] }
+        client = @clients['data'].find {|c| c['id'] == project['cid'] }
+        task = @tasks['data'].find {|t| t['id'] == time_entry['tid'] }
+
+        if time_entry['pid'].present? and client['name'] =~ /^Dyers|Ausfast|Imagesoft|DKL/ then
+          time_entry['project'] = {'client_project_name' => "#{client['name']} - #{project['name']}"}
+          time_entry['task'] = {'name' => task['name']}
           @time_entries << time_entry
         else
           next
         end
 
-        date       = Date.parse(time_entry['start'])
-        start      = DateTime.parse(time_entry['start'])
-        stop       = DateTime.parse(time_entry['stop'])
-        client     = time_entry['project']['client_project_name'].sub('-', '/')
-        dateIdx    = date.strftime('%Y%m%d')
-        week_start = Date.commercial(date.cwyear, date.cweek, 1)
-        week_end   = Date.commercial(date.cwyear, date.cweek, 7)
+        date        = Date.parse(time_entry['start'])
+        start       = DateTime.parse(time_entry['start'])
+        stop        = DateTime.parse(time_entry['stop'])
+        client_name = "#{client['name']} - #{project['name']}".sub('-', '/')
+        dateIdx     = date.strftime('%Y%m%d')
+        week_start  = Date.commercial(date.cwyear, date.cweek, 1)
+        week_end    = Date.commercial(date.cwyear, date.cweek, 7)
 
         if week_end > @end_date then
           week_end = @end_date
@@ -69,8 +78,8 @@ class TimesheetController < ApplicationController
           @round_threshold = @round_to_nearest / 2
         end
 
-        if not @timesheet[dateIdx].has_key?("#{client}") then
-          @timesheet[dateIdx][client] = {
+        if not @timesheet[dateIdx].has_key?("#{client_name}") then
+          @timesheet[dateIdx][client_name] = {
             :duration => 0,
             :travel   => 0,
             :times    => [],
@@ -102,24 +111,24 @@ class TimesheetController < ApplicationController
 
         duration = ((stop - start) / 60).to_i
 
-        @timesheet[dateIdx][client][:duration] += duration
+        @timesheet[dateIdx][client_name][:duration] += duration
 
         if not time_entry['task'].nil? and time_entry['task']['name'] == 'Travel'
-          @timesheet[dateIdx][client][:travel] += duration
+          @timesheet[dateIdx][client_name][:travel] += duration
         end
 
-        if not @timesheet[dateIdx][client][:tasks].include?(
+        if not @timesheet[dateIdx][client_name][:tasks].include?(
           time_entry['description']
         ) then
-          @timesheet[dateIdx][client][:tasks] << time_entry['description']
+          @timesheet[dateIdx][client_name][:tasks] << time_entry['description']
         end
 
-        last = @timesheet[dateIdx][client][:times].last
+        last = @timesheet[dateIdx][client_name][:times].last
 
         if not last.nil? and last[:stop] == start
-          @timesheet[dateIdx][client][:times][-1][:stop] = stop
+          @timesheet[dateIdx][client_name][:times][-1][:stop] = stop
         elsif start != stop
-          @timesheet[dateIdx][client][:times] << {
+          @timesheet[dateIdx][client_name][:times] << {
             :start => start,
             :stop  => stop
           }
@@ -128,9 +137,6 @@ class TimesheetController < ApplicationController
     end
 
     # :user_id => 273621
-
-    @clients  = toggl.clients()
-    @projects = toggl.projects()
 
     respond_to do |format|
       format.html
