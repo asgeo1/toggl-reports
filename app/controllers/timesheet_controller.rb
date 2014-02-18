@@ -29,7 +29,7 @@ class TimesheetController < ApplicationController
     @round_to_nearest = 30
     @round_threshold  = @round_to_nearest / 2
 
-    if time_entries.present?
+    if time_entries.present? and time_entries['data'].present?
       time_entries['data'].each do |time_entry|
         if time_entry['project']['client_project_name'] =~
         /^Dyers|Ausfast|Imagesoft|DKL/ then
