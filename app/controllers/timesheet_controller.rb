@@ -29,99 +29,101 @@ class TimesheetController < ApplicationController
     @round_to_nearest = 30
     @round_threshold  = @round_to_nearest / 2
 
-    time_entries['data'].each do |time_entry|
-      if time_entry['project']['client_project_name'] =~
-      /^Dyers|Ausfast|Imagesoft|DKL/ then
-        @time_entries << time_entry
-      else
-        next
-      end
+    if time_entries.present?
+      time_entries['data'].each do |time_entry|
+        if time_entry['project']['client_project_name'] =~
+        /^Dyers|Ausfast|Imagesoft|DKL/ then
+          @time_entries << time_entry
+        else
+          next
+        end
 
-      date       = Date.parse(time_entry['start'])
-      start      = DateTime.parse(time_entry['start'])
-      stop       = DateTime.parse(time_entry['stop'])
-      client     = time_entry['project']['client_project_name'].sub('-', '/')
-      dateIdx    = date.strftime('%Y%m%d')
-      week_start = Date.commercial(date.cwyear, date.cweek, 1)
-      week_end   = Date.commercial(date.cwyear, date.cweek, 7)
+        date       = Date.parse(time_entry['start'])
+        start      = DateTime.parse(time_entry['start'])
+        stop       = DateTime.parse(time_entry['stop'])
+        client     = time_entry['project']['client_project_name'].sub('-', '/')
+        dateIdx    = date.strftime('%Y%m%d')
+        week_start = Date.commercial(date.cwyear, date.cweek, 1)
+        week_end   = Date.commercial(date.cwyear, date.cweek, 7)
 
-      if week_end > @end_date then
-        week_end = @end_date
-      end
+        if week_end > @end_date then
+          week_end = @end_date
+        end
 
-      if week_start < @start_date then
-        week_start = @start_date
-      end
+        if week_start < @start_date then
+          week_start = @start_date
+        end
 
-      if not @weeks.has_key?("#{date.cwyear}_#{date.cweek}") then
-        @weeks["#{date.cwyear}_#{date.cweek}"] = {
-          :start => week_start,
-          :end   => week_end
-        }
-      end
+        if not @weeks.has_key?("#{date.cwyear}_#{date.cweek}") then
+          @weeks["#{date.cwyear}_#{date.cweek}"] = {
+            :start => week_start,
+            :end   => week_end
+          }
+        end
 
-      if not @timesheet.has_key?("#{dateIdx}") then
-        @timesheet[dateIdx] = {}
-        #round start-of-day time to nearest half-hour based on first 20 minutes
-        @round_threshold = @round_to_nearest / 3 * 2
-      else
-        @round_threshold = @round_to_nearest / 2
-      end
+        if not @timesheet.has_key?("#{dateIdx}") then
+          @timesheet[dateIdx] = {}
+          #round start-of-day time to nearest half-hour based on first 20 minutes
+          @round_threshold = @round_to_nearest / 3 * 2
+        else
+          @round_threshold = @round_to_nearest / 2
+        end
 
-      if not @timesheet[dateIdx].has_key?("#{client}") then
-        @timesheet[dateIdx][client] = {
-          :duration => 0,
-          :travel   => 0,
-          :times    => [],
-          :tasks    => []
-        }
-      end
+        if not @timesheet[dateIdx].has_key?("#{client}") then
+          @timesheet[dateIdx][client] = {
+            :duration => 0,
+            :travel   => 0,
+            :times    => [],
+            :tasks    => []
+          }
+        end
 
-      #Round the individual tasks first
-      start_floor = Time.at((start.to_f / (@round_to_nearest*60)).floor * (@round_to_nearest*60))
-      stop_floor  = Time.at((stop.to_f  / (@round_to_nearest*60)).floor * (@round_to_nearest*60))
+        #Round the individual tasks first
+        start_floor = Time.at((start.to_f / (@round_to_nearest*60)).floor * (@round_to_nearest*60))
+        stop_floor  = Time.at((stop.to_f  / (@round_to_nearest*60)).floor * (@round_to_nearest*60))
 
-      if Time.at(start.to_f) - start_floor > @round_threshold*60 then
-        start = start_floor + @round_to_nearest*60
-      else
-        start = start_floor
-      end
+        if Time.at(start.to_f) - start_floor > @round_threshold*60 then
+          start = start_floor + @round_to_nearest*60
+        else
+          start = start_floor
+        end
 
-      if Time.at(stop.to_f) - stop_floor > @round_threshold*60 then
-        stop = stop_floor + @round_to_nearest*60
-      else
-        stop = stop_floor
-      end
+        if Time.at(stop.to_f) - stop_floor > @round_threshold*60 then
+          stop = stop_floor + @round_to_nearest*60
+        else
+          stop = stop_floor
+        end
 
-      # toggle for some reason records the end time if it is past midnight as
-      # the same date, even though it is really the next day
-      if stop < start then
-        stop = stop + 1.day
-      end
+        # toggle for some reason records the end time if it is past midnight as
+        # the same date, even though it is really the next day
+        if stop < start then
+          stop = stop + 1.day
+        end
 
-      duration = ((stop - start) / 60).to_i
+        duration = ((stop - start) / 60).to_i
 
-      @timesheet[dateIdx][client][:duration] += duration
+        @timesheet[dateIdx][client][:duration] += duration
 
-      if not time_entry['task'].nil? and time_entry['task']['name'] == 'Travel'
-        @timesheet[dateIdx][client][:travel] += duration
-      end
+        if not time_entry['task'].nil? and time_entry['task']['name'] == 'Travel'
+          @timesheet[dateIdx][client][:travel] += duration
+        end
 
-      if not @timesheet[dateIdx][client][:tasks].include?(
-        time_entry['description']
-      ) then
-        @timesheet[dateIdx][client][:tasks] << time_entry['description']
-      end
+        if not @timesheet[dateIdx][client][:tasks].include?(
+          time_entry['description']
+        ) then
+          @timesheet[dateIdx][client][:tasks] << time_entry['description']
+        end
 
-      last = @timesheet[dateIdx][client][:times].last
+        last = @timesheet[dateIdx][client][:times].last
 
-      if not last.nil? and last[:stop] == start
-        @timesheet[dateIdx][client][:times][-1][:stop] = stop
-      elsif start != stop
-        @timesheet[dateIdx][client][:times] << {
-          :start => start,
-          :stop  => stop
-        }
+        if not last.nil? and last[:stop] == start
+          @timesheet[dateIdx][client][:times][-1][:stop] = stop
+        elsif start != stop
+          @timesheet[dateIdx][client][:times] << {
+            :start => start,
+            :stop  => stop
+          }
+        end
       end
     end
 
