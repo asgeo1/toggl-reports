@@ -36,6 +36,9 @@ class TimesheetController < ApplicationController
     if time_entries.present? and time_entries['data'].present?
       time_entries['data'].each do |time_entry|
         project = @projects['data'].find {|p| p['id'] == time_entry['pid'] }
+        if project.nil?
+          next
+        end
         client = @clients['data'].find {|c| c['id'] == project['cid'] }
         task = @tasks['data'].find {|t| t['id'] == time_entry['tid'] }
 
